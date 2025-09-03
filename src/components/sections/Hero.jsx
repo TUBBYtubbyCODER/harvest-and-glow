@@ -1,77 +1,68 @@
-import { useState, useEffect } from 'react'
-import Button from '@components/common/Button'
-import FadeInUp from '@components/animations/FadeInUp'
-import analytics from '@services/analytics'
+import { useState, useEffect } from 'react';
+import analytics from '@services/analytics';
 
 const Hero = () => {
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setLoaded(true)
-  }, [])
+    setLoaded(true);
+    analytics.trackPageView('Hero');
+  }, []);
 
-  const handleBookingClick = () => {
-    analytics.trackEvent('hero_cta_click', { action: 'book_display' })
-  }
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
-  const handleGiftClick = () => {
-    analytics.trackEvent('hero_cta_click', { action: 'send_gift' })
-  }
+  const handleCTAClick = (buttonType, targetSection) => {
+    analytics.trackEvent('cta_clicked', {
+      button: buttonType,
+      location: 'hero',
+      target_section: targetSection
+    });
+    scrollToSection(targetSection);
+  };
 
   return (
     <section id="home" className="hero">
-      <div className="hero-background">
-        <picture>
-          <source 
-            srcSet="/images/hero/hero-pumpkin-display.webp" 
-            type="image/webp" 
-          />
-          <img 
-            src="/images/hero/hero-pumpkin-display.jpg"
-            alt="Beautiful pumpkin display on elegant porch"
-            loading="eager"
-            className="hero-image"
-          />
-        </picture>
-        <div className="hero-overlay"></div>
-      </div>
-
       <div className={`hero-content ${loaded ? 'loaded' : ''}`}>
-        <FadeInUp delay={0.2}>
-          <h1 className="cursive hero-title">
-            Brighten Your Neighborhood
-          </h1>
-        </FadeInUp>
+        <h1 className="cursive">Brighten Your Neighborhood</h1>
+        <p>With effortless seasonal charm and luxury pumpkin displays that create magical autumn memories</p>
+        <div className="cta-buttons">
+          <button 
+            className="btn btn-primary glow-effect"
+            onClick={() => handleCTAClick('Book Your Display', 'packages')}
+          >
+            Book Your Display
+          </button>
+          <button 
+            className="btn btn-secondary"
+            onClick={() => handleCTAClick('Send as Gift', 'gift')}
+          >
+            Send as Gift
+          </button>
+        </div>
         
-        <FadeInUp delay={0.4}>
-          <p className="hero-subtitle">
-            With effortless seasonal charm and luxury pumpkin displays 
-            that create magical autumn memories
-          </p>
-        </FadeInUp>
-        
-        <FadeInUp delay={0.6}>
-          <div className="cta-buttons">
-            <Button 
-              href="#packages" 
-              variant="primary"
-              className="glow-effect"
-              onClick={handleBookingClick}
-            >
-              Book Your Display
-            </Button>
-            <Button 
-              href="#gift" 
-              variant="secondary"
-              onClick={handleGiftClick}
-            >
-              Send as Gift
-            </Button>
+        {/* Trust indicators */}
+        <div className="hero-trust">
+          <div className="trust-item">
+            <span className="trust-icon">🏆</span>
+            <span>Premium Quality</span>
           </div>
-        </FadeInUp>
+          <div className="trust-item">
+            <span className="trust-icon">📍</span>
+            <span>Salt Lake City</span>
+          </div>
+          <div className="trust-item">
+            <span className="trust-icon">⭐</span>
+            <span>100+ Happy Families</span>
+          </div>
+        </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

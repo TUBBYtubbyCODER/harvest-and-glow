@@ -1,43 +1,49 @@
-import { useState } from 'react'
-import Button from '@components/common/Button'
-import { formatPrice } from '@utils/helpers'
-import { createCheckoutSession } from '@services/stripe'
-import analytics from '@services/analytics'
+import { useState } from 'react';
+import analytics from '@services/analytics';
 
 const PackageCard = ({ 
-  id, 
+  id,
   title, 
   price, 
+  originalPrice,
   description, 
   features, 
   emoji, 
   popular = false,
-  stripeProductId 
+  highlights = [],
+  deliveryTime,
+  customizationLevel
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleBooking = async () => {
-    setLoading(true)
-    analytics.trackEvent('package_booking_click', { 
-      package_id: id,
-      package_name: title,
-      price: price
-    })
-
+    setIsLoading(true);
+    
+    // Track package selection
+    analytics.trackPackageInterest(title, price);
+    
     try {
-      await createCheckoutSession(
-        stripeProductId,
-        `${window.location.origin}/success?package=${id}`,
-        `${window.location.origin}/cancel`
-      )
+      // In production, this would integrate with Stripe
+      // For now, we'll show an alert
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      
+      alert(`Booking ${title} package - Stripe integration will process this payment in production`);
+      
+      // Track successful booking intent
+      analytics.trackEvent('booking_initiated', {
+        package_id: id,
+        package_name: title,
+        package_price: price
+      });
+      
     } catch (error) {
-      console.error('Booking error:', error)
-      alert('Sorry, there was an error processing your request. Please try again.')
+      console.error('Booking error:', error);
+      alert('Sorry, there was an error processing your request. Please try again.');
     } finally {
-      setLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div 
@@ -45,43 +51,72 @@ const PackageCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {popular && <div className="popular-badge">Most Popular</div>}
+      {popular && (
+        <div className="popular-badge">
+          Most Popular
+        </div>
+      )}
       
       <div className="package-image">
-        <span 
-          className="package-emoji"
-          style={{ 
-            fontSize: isHovered ? '5rem' : '4rem',
-            transition: 'all 0.3s ease' 
-          }}
-        >
+        <span style={{ 
+          fontSize: isHovered ? '5rem' : '4rem', 
+          transition: 'all 0.3s ease' 
+        }}>
           {emoji}
         </span>
       </div>
       
       <div className="package-content">
         <h3 className="package-title cursive">{title}</h3>
-        <div className="package-price">{formatPrice(price)}</div>
+        
+        <div className="package-pricing">
+          <div className="package-price">${price}</div>
+          {originalPrice && (
+            <div className="original-price">${originalPrice}</div>
+          )}
+        </div>
+        
         <p className="package-description">{description}</p>
+        
+        {highlights.length > 0 && (
+          <div className="package-highlights">
+            {highlights.map((highlight, index) => (
+              <span key={index} className="highlight-tag">
+                {highlight}
+              </span>
+            ))}
+          </div>
+        )}
         
         <ul className="package-features">
           {features.map((feature, index) => (
-            <li key={index}>✓ {feature}</li>
+            <li key={index}>
+              <span className="feature-check">✓</span>
+              {feature}
+            </li>
           ))}
         </ul>
         
-        <Button 
-          variant="primary"
+        <div className="package-meta">
+          <div className="meta-item">
+            <strong>Delivery:</strong> {deliveryTime}
+          </div>
+          <div className="meta-item">
+            <strong>Customization:</strong> {customizationLevel}
+          </div>
+        </div>
+        
+        <button 
+          className={`btn btn-primary ${isLoading ? 'loading' : ''}`}
           onClick={handleBooking}
-          disabled={loading}
-          className="package-cta"
-          fullWidth
+          disabled={isLoading}
+          style={{ width: '100%', marginTop: '1rem' }}
         >
-          {loading ? 'Processing...' : 'Book Now'}
-        </Button>
+          {isLoading ? 'Processing...' : 'Book Now'}
+        </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PackageCard
+export default PackageCard;

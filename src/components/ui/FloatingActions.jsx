@@ -1,67 +1,106 @@
-import { useState, useEffect } from 'react'
-import { useScrollPosition } from '@hooks/useScrollPosition'
-import analytics from '@services/analytics'
+import { useState, useEffect } from 'react';
+import analytics from '@services/analytics';
 
 const FloatingActions = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false)
-  const scrollPosition = useScrollPosition()
+  const [isVisible, setIsVisible] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    setShowScrollTop(scrollPosition > 300)
-  }, [scrollPosition])
+    const handleScroll = () => {
+      // Show floating actions after scrolling past hero
+      setIsVisible(window.scrollY > 200);
+      // Show scroll to top button after scrolling down significantly
+      setShowScrollTop(window.scrollY > 1000);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleCallClick = () => {
+    analytics.trackEvent('contact_clicked', {
+      method: 'phone',
+      location: 'floating_action'
+    });
+    window.location.href = 'tel:8015554569';
+  };
+
+  const handleEmailClick = () => {
+    analytics.trackEvent('contact_clicked', {
+      method: 'email',
+      location: 'floating_action'
+    });
+    window.location.href = 'mailto:info@harvestandglow.com';
+  };
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    analytics.trackEvent('scroll_to_top', { source: 'floating_button' })
-  }
+    analytics.trackEvent('navigation', {
+      action: 'scroll_to_top',
+      location: 'floating_action'
+    });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
-  const openChat = () => {
-    analytics.trackEvent('chat_opened', { source: 'floating_button' })
-    // Initialize chat widget (Intercom, Drift, etc.)
-    if (window.Intercom) {
-      window.Intercom('show')
-    } else {
-      alert('Chat support coming soon! Please email us at hello@harvestandglow.com')
+  const scrollToSection = (sectionId, buttonName) => {
+    analytics.trackEvent('navigation', {
+      action: 'scroll_to_section',
+      section: sectionId,
+      location: 'floating_action'
+    });
+    
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
-  }
+  };
 
-  const callPhone = () => {
-    analytics.trackEvent('phone_clicked', { source: 'floating_button' })
-    window.location.href = 'tel:+18015554569'
-  }
+  if (!isVisible) return null;
 
   return (
     <div className="floating-actions">
-      <button 
-        className="floating-btn chat-btn"
-        onClick={openChat}
-        title="Chat with us"
-        aria-label="Open live chat"
-      >
-        💬
-      </button>
-      
-      <button 
-        className="floating-btn phone-btn"
-        onClick={callPhone}
-        title="Call us"
-        aria-label="Call Harvest & Glow"
-      >
-        📞
-      </button>
-      
+      {/* Main action buttons */}
+      <div className="action-buttons">
+        <button
+          className="action-btn primary"
+          onClick={() => scrollToSection('packages', 'Book Now')}
+          title="View Packages"
+        >
+          Book Now
+        </button>
+        
+        <button
+          className="action-btn secondary"
+          onClick={handleCallClick}
+          title="Call us"
+        >
+          📞 Call
+        </button>
+        
+        <button
+          className="action-btn secondary"
+          onClick={handleEmailClick}
+          title="Email us"
+        >
+          📧 Email
+        </button>
+      </div>
+
+      {/* Scroll to top button */}
       {showScrollTop && (
-        <button 
-          className="floating-btn scroll-top-btn"
+        <button
+          className="scroll-top-btn"
           onClick={scrollToTop}
-          title="Back to top"
-          aria-label="Scroll to top of page"
+          title="Scroll to top"
+          aria-label="Scroll to top"
         >
           ↑
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default FloatingActions
+export default FloatingActions;
