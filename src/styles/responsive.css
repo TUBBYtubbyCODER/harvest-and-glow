@@ -1,0 +1,248 @@
+/* Mobile First Responsive Design */
+
+/* Mobile Styles (default) */
+@media (max-width: 767px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .packages-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-sections {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .nav-links {
+    display: none;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+  }
+  
+  .floating-actions {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .floating-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .newsletter-form .form-group {
+    flex-direction: column;
+  }
+  
+  .cookie-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .cookie-content {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-newsletter {
+    flex-direction: column;
+  }
+  
+  .footer-newsletter input {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-title {
+    font-size: 3.5rem;
+  }
+  
+  .packages-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+  .nav-links {
+    display: flex;
+  }
+  
+  .mobile-menu-toggle {
+    display: none;
+  }
+  
+  .packages-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large Desktop Styles */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1200px;
+  }
+  
+  .hero-title {
+    font-size: 5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.8rem;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hero-image {
+    /* Use higher resolution images */
+  }
+}
+
+/* Print Styles */
+@media print {
+  .header,
+  .cta-buttons,
+  .btn,
+  .upload-area,
+  .gift-form,
+  .floating-actions,
+  .cookie-banner {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .section {
+    page-break-inside: avoid;
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    color: black !important;
+    font-size: 18pt;
+    margin-bottom: 1rem;
+  }
+  
+  .package-card {
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+    page-break-inside: avoid;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .glow-effect {
+    animation: none;
+  }
+  
+  .pulse,
+  .bounce {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --autumn-orange: #FF4500;
+    --harvest-brown: #000000;
+    --cream: #FFFFFF;
+  }
+  
+  .btn {
+    border: 2px solid currentColor !important;
+  }
+  
+  .package-card {
+    border: 2px solid #000 !important;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream: #1a1a1a;
+    --harvest-brown: #f4f4f4;
+  }
+  
+  body {
+    background-color: #1a1a1a;
+    color: #f4f4f4;
+  }
+  
+  .package-card,
+  .testimonials-carousel,
+  .gift-form {
+    background: #2a2a2a;
+    color: #f4f4f4;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: #3a3a3a;
+    color: #f4f4f4;
+    border-color: #555;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero {
+    height: auto;
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+}
