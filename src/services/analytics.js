@@ -1,64 +1,110 @@
-class Analytics {
+// Analytics service for tracking user interactions
+// For production, you would integrate with Google Analytics, Facebook Pixel, etc.
+
+class AnalyticsService {
   constructor() {
-    this.isEnabled = import.meta.env.VITE_GOOGLE_ANALYTICS_ID
-    if (this.isEnabled) {
-      this.init()
-    }
+    this.isProduction = import.meta.env.PROD;
+    this.events = [];
   }
 
-  init() {
-    // Load Google Analytics
-    const script = document.createElement('script')
-    script.async = true
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${import.meta.env.VITE_GOOGLE_ANALYTICS_ID}`
-    document.head.appendChild(script)
+  // Track page views
+  trackPageView(pageName) {
+    const event = {
+      type: 'page_view',
+      page: pageName,
+      timestamp: new Date().toISOString(),
+      url: window.location.href
+    };
 
-    window.dataLayer = window.dataLayer || []
-    function gtag() {
-      window.dataLayer.push(arguments)
-    }
-    gtag('js', new Date())
-    gtag('config', import.meta.env.VITE_GOOGLE_ANALYTICS_ID, {
-      send_page_view: false // We'll send this manually
-    })
-
-    window.gtag = gtag
-  }
-
-  trackEvent(eventName, parameters = {}) {
-    if (this.isEnabled && window.gtag) {
-      window.gtag('event', eventName, {
-        event_category: parameters.category || 'engagement',
-        event_label: parameters.label,
-        value: parameters.value,
-        ...parameters
-      })
-    }
+    this.events.push(event);
     
-    // Also log to console in development
-    if (import.meta.env.DEV) {
-      console.log('Analytics Event:', eventName, parameters)
+    if (this.isProduction) {
+      // In production, send to actual analytics service
+      this.sendToAnalytics(event);
+    } else {
+      console.log('Analytics Event:', event);
     }
   }
 
-  trackPageView(path) {
-    if (this.isEnabled && window.gtag) {
-      window.gtag('config', import.meta.env.VITE_GOOGLE_ANALYTICS_ID, {
-        page_path: path,
-      })
+  // Track user interactions
+  trackEvent(eventName, properties = {}) {
+    const event = {
+      type: 'custom_event',
+      name: eventName,
+      properties,
+      timestamp: new Date().toISOString(),
+      url: window.location.href
+    };
+
+    this.events.push(event);
+
+    if (this.isProduction) {
+      this.sendToAnalytics(event);
+    } else {
+      console.log('Analytics Event:', event);
     }
   }
 
-  trackPurchase(transactionId, value, currency = 'USD', items = []) {
-    if (this.isEnabled && window.gtag) {
-      window.gtag('event', 'purchase', {
-        transaction_id: transactionId,
-        value: value,
-        currency: currency,
-        items: items
-      })
+  // Track package selections
+  trackPackageInterest(packageName, price) {
+    this.trackEvent('package_viewed', {
+      package_name: packageName,
+      package_price: price,
+      category: 'packages'
+    });
+  }
+
+  // Track form submissions
+  trackFormSubmission(formType) {
+    this.trackEvent('form_submitted', {
+      form_type: formType,
+      category: 'conversion'
+    });
+  }
+
+  // Track file uploads
+  trackFileUpload(fileCount, fileTypes) {
+    this.trackEvent('files_uploaded', {
+      file_count: fileCount,
+      file_types: fileTypes.join(','),
+      category: 'custom_carve'
+    });
+  }
+
+  // Send to actual analytics service (placeholder)
+  sendToAnalytics(event) {
+    // In production, this would send to:
+    // - Google Analytics 4
+    // - Facebook Pixel
+    // - Your own analytics endpoint
+    
+    if (window.gtag) {
+      window.gtag('event', event.name || event.type, {
+        custom_parameter_1: event.properties || {},
+        page_path: event.url
+      });
     }
+  }
+
+  // Get all tracked events (for debugging)
+  getEvents() {
+    return this.events;
+  }
+
+  // Clear events (for testing)
+  clearEvents() {
+    this.events = [];
   }
 }
 
-export default new Analytics()
+// Create singleton instance
+const analytics = new AnalyticsService();
+
+export default analytics;
+
+// Named exports for specific functions
+export const trackPageView = (pageName) => analytics.trackPageView(pageName);
+export const trackEvent = (eventName, properties) => analytics.trackEvent(eventName, properties);
+export const trackPackageInterest = (packageName, price) => analytics.trackPackageInterest(packageName, price);
+export const trackFormSubmission = (formType) => analytics.trackFormSubmission(formType);
+export const trackFileUpload = (fileCount, fileTypes) => analytics.trackFileUpload(fileCount, fileTypes);
